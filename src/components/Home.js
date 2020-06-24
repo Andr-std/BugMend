@@ -3,17 +3,18 @@ import { Link } from 'react-router-dom';
 
 const Home = () => {
     const [name, setName] = useState('')
+    const [isInstructor, setIsInstructor] = useState(false)
+    const toggleCheck = () => {
+        setIsInstructor(!isInstructor)
+    }
+    console.log(isInstructor)
     return (
         <div className="All">
-            <div className="Instructors">
-                <div><input placeholder="Name" type="text" onChange={(event) => setName(event.target.value)} /></div>
-                <Link onClick={event => (!name) ? event.preventDefault() : null} to={`/instructor?name=${name}`}>
-                    <button className="signin" type="submit">Sign In</button>
-                </Link>
-            </div>
-            <div className="Students">
-                <div><input placeholder="Name" type="text" onChange={(event) => setName(event.target.value)} /></div>
-                <Link onClick={event => (!name) ? event.preventDefault() : null} to={`/student?name=${name}`}>
+
+            <div><input placeholder="Name" type="text" onChange={(event) => setName(event.target.value)} /></div>
+            <div onClick={() => toggleCheck()}><input name="isInstructor" type="checkbox" checked={isInstructor} onChange={toggleCheck} /></div>
+            <div className="Users">
+                <Link onClick={event => (!name) ? event.preventDefault() : null} to={`/user?name=${name}&isInstructor=${isInstructor}`}>
                     <button className="signin" type="submit">Sign In</button>
                 </Link>
             </div>

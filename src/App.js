@@ -2,16 +2,14 @@ import React from "react"; //, { useState, useEffect }
 import { BrowserRouter as Router, Route } from "react-router-dom";
 // import socketIOClient from "socket.io-client";
 import Home from './components/Home';
-import Student from './components/Student';
-import Instructor from './components/Instructor';
+import User from './components/User';
 // const ENDPOINT = "localhost:8080";
 
 const App = () => {
   return (
     <Router>
       <Route path='/' exact component={Home}></Route>
-      <Route path='/instructor' component={Instructor}></Route>
-      <Route path='/student' component={Student}></Route>
+      <Route path='/user' component={User}></Route>
     </Router>
   )
 };
