@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import io from "socket.io-client";
 const ENDPOINT = "localhost:8080";
 
@@ -7,26 +7,23 @@ socket = io(ENDPOINT);
 
 export const Message = (props) => {
     const [isOpenForAnswer, setIsOpenForAnswer] = useState(false)
-    const [message, setMessage] = useState({})
+    const [messageBody, setMessageBody] = useState('')
 
     const sendMessage = (event) => {
-        event.preventDefault()
+
+
+        // event.preventDefault()
+        const message = { id: props.messages.length + 1, messageId: props.messageId, userId: props.userId, body: messageBody, isQuestion: false, isPublic: true, isAnonym: true }
+
         if (message) {
-            socket.emit('sendMessage', message, () => setMessage({}));
+            socket.emit('sendMessage', message, () => setMessageBody(''));
         }
     }
     return (
         <div>
             {props.body}
             {props.isQuestion ? <button className="send" type="button" onClick={(event) => setIsOpenForAnswer(!isOpenForAnswer)}>Reply</button> : null}
-            {isOpenForAnswer ? <input onChange={(event) => setMessage({
-                id: props.messages.length + 1,
-                messageId: props.messageId,
-                userId: props.userId,
-                body: event.target.value,
-                isQuestion: false, isPublic: true,
-                isAnonym: true
-            })} /> : null}
+            {isOpenForAnswer ? <input onChange={(event) => setMessageBody(event.target.value)} /> : null}
             {isOpenForAnswer ? <button className="send" type="submit" onClick={(event) => sendMessage(event)}>Send</button> : null}
         </div>
     )

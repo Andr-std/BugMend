@@ -12,7 +12,7 @@ const Home = () => {
         <div className="All">
 
             <div><input placeholder="Name" type="text" onChange={(event) => setName(event.target.value)} /></div>
-            <div onClick={() => toggleCheck()}><input name="isInstructor" type="checkbox" checked={isInstructor} onChange={toggleCheck} /></div>
+            <div><input name="isInstructor" type="checkbox" checked={isInstructor} onChange={(event) => { toggleCheck() }} />Instructor</div>
             <div className="Users">
                 <Link onClick={event => (!name) ? event.preventDefault() : null} to={`/user?name=${name}&isInstructor=${isInstructor}`}>
                     <button className="signin" type="submit">Sign In</button>
