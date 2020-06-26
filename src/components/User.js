@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import io from "socket.io-client";
 import queryString from 'query-string'
 import { Message } from './Message';
+import { Help } from './Help';
 const ENDPOINT = "localhost:8080";
 
 
@@ -12,7 +13,7 @@ let socket;
 
 const User = () => {
 
-    const [, setName] = useState('');
+    const [name, setName] = useState('');
     const [isInstructor, setIsInstructor] = useState(false)
     const [messages, setMessages] = useState([])
     const [helps, setHelps] = useState([])
@@ -40,7 +41,7 @@ const User = () => {
 
     useEffect(() => {
         const { name, isInstructor } = queryString.parse(window.location.search)
-        // console.log(isInstructor)
+        // console.log('1', isInstructor)
         setName(name)
         setIsInstructor(isInstructor)
 
@@ -59,6 +60,7 @@ const User = () => {
             // messagesObj.current = messages
             // console.log(messages)
         })
+        console.log('effect1', helps)
 
         // console.log(messages)
         return () => {
@@ -66,7 +68,7 @@ const User = () => {
 
             socket.off();
         }
-    }, [setName, isInstructor])//[ENDPOINT, window.location.search]
+    }, [setName])//[ENDPOINT, window.location.search]
 
     useEffect(() => {
         console.log(messages)
@@ -77,19 +79,26 @@ const User = () => {
             // console.log('effect', message)
             // console.log('effect', messages)
         })
-        socket.on('help', (help) => {
+        setHelps([])
+        console.log('effect2', helps)
+        socket.on('helps', (helps) => {
             // console.log(messages)
             // setMessages([...messages, message])
-            setHelps(prev => [...prev, help])
+            setHelps(helps)//prev => [...prev, ...helps]
             // console.log('effect', message)
             // console.log('effect', messages)
         })
+        console.log('effect3', helps)
     }, [])
     const sendMessage = (event) => {
 
 
         // event.preventDefault()
-        const message = { id: messages.length + 1, userId: socket.id, body: messageBody, isQuestion: true, isPublic, isAnonym }
+        const message = {
+            name: name, id: messages.length + 1, userId: socket.id,
+            body: messageBody, isQuestion: true, isPublic, isAnonym,
+            Qname: name, Rname: ''
+        }
 
         if (message) {
             socket.emit('sendMessage', message);
@@ -99,8 +108,8 @@ const User = () => {
     const askHelp = (event) => {
 
         // event.preventDefault()
-        const help = { id: helps.length + 1, userId: socket.id, isTaken: false }
-
+        const help = { id: helps.length + 1, userId: socket.id, isTaken: false, stdName: name, instName: '', instId: '' }
+        console.log('askHelp', help)
         if (help) {
             socket.emit('askHelp', help);
         }
@@ -109,20 +118,20 @@ const User = () => {
 
     useEffect(() => {
 
-        console.log(messages)
-        console.log('instr', isInstructor)
-        if (isInstructor === true) {
-            console.log(isInstructor)
+        // console.log(messages)
+        // console.log('instr', isInstructor)
+        if (isInstructor === 'true') {
+            // console.log(isInstructor)
             let newLocalQuestions = messages.filter((localquestion) => {
                 return localquestion.isQuestion
             })
             setLocalQuestions(newLocalQuestions)
         }
         else {
-            console.log('soething')
+            // console.log('soething')
             let newLocalQuestions = messages.filter((localquestion) => {
                 // console.log(localquestion.userId === socket.id)
-                console.log('pub', localquestion.isPublic)
+                // console.log('pub', localquestion.isPublic)
                 return ((localquestion.userId === socket.id) || localquestion.isPublic) && localquestion.isQuestion
             })
             console.log(newLocalQuestions)
@@ -134,35 +143,50 @@ const User = () => {
         let localmessages = []
         localquestions.forEach(localquestion => { localmessages.push(localquestion, ...messages.filter(messageitem => { return messageitem.messageId === localquestion.id })) })
         setLocalMessages(localmessages)
-        console.log(localmessages)
-        console.log(localquestions)
+        // console.log(localmessages)
+        // console.log(localquestions)
     }, [localquestions])
 
-    // console.log(localquestions)
+    // console.log('2', isInstructor)
     // console.log(localmessages)
     return (
 
         <div>
             <div>
-                <input onChange={(event) => setMessageBody(event.target.value)} />
-                <div><input name="isAnonym" type="checkbox" checked={isAnonym} onChange={(event) => { toggleCheck() }} />Anonymous Question</div>
-                {isAnonym ? <div>Anonymous questions are public!</div> :
-                    <div><input name="isPublic" type="checkbox" checked={isPublic} onChange={(event) => { toggleCheck2() }} /> Public Question</div>
-                }
+                {isInstructor === 'true' ? null :
+                    <div>
+                        Message: <input onChange={(event) => setMessageBody(event.target.value)} />
+                        <div><input name="isAnonym" type="checkbox" checked={isAnonym} onChange={(event) => { toggleCheck() }} />Anonymous Question</div>
+                        {isAnonym ? <div>Anonymous questions are public!</div> :
+                            <div><input name="isPublic" type="checkbox" checked={isPublic} onChange={(event) => { toggleCheck2() }} /> Public Question</div>
+                        }
 
-                <button className="send" type="submit" onClick={(event) => sendMessage(event)}>Send</button>
-                {console.log('inst', isInstructor)}
-                {isInstructor ? null : <button className="help" type="submit" onClick={(event) => askHelp(event)}>Ask for help</button>}
-
-                <span>{messages.length}</span>
-                {helps.map(helpItem => (
-                    helpItem.isTaken ? <button className="helptaken" type="submit" onClick={(event) => takeHelp(event)}>Take help request</button> : 'Help request taken'
-                ))}
+                        <button className="send" type="submit" onClick={(event) => sendMessage(event)}>Send</button>
+                        {/* {console.log('inst', isInstructor)} */}
+                        <button className="help" type="submit" onClick={(event) => askHelp(event)}>Ask for help</button>
+                    </div>}
+                {/* <span>{messages.length}</span> */}
+                {console.log('map', isInstructor === 'true')}
+                {isInstructor === 'true' ? helps.map(helpItem => (
+                    <Help id={helpItem.id}
+                        isTaken={helpItem.isTaken}
+                        userId={helpItem.userId}
+                        instId={helpItem.instId}
+                        socketId={socket.id}
+                        instName={helpItem.instName}
+                        name={name}
+                        stdName={helpItem.stdName}
+                        key={helpItem.id} />
+                )) : null}
                 {localmessages.map(localmessage => (
                     <Message body={localmessage.body}
                         messageId={localmessage.id}
                         isQuestion={localmessage.isQuestion}
                         userId={localmessage.userId}
+                        Qname={localmessage.isAnonym ? 'Anonymous user' : localmessage.Qname}
+                        socketId={socket.id}
+                        Rname={localmessage.Rname}
+                        name={name}
                         messages={messages}
                         key={localmessage.id} />
                 ))}
