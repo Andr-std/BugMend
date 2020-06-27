@@ -25,6 +25,7 @@ export const Message = (props) => {
 
         if (message) {
             socket.emit('sendMessage', message, () => setMessageBody(''));
+            setIsOpenForAnswer(!isOpenForAnswer)
         }
     }
     return (

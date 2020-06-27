@@ -22,6 +22,7 @@ const User = () => {
     const [isAnonym, setIsAnonym] = useState(true)
     const [localmessages, setLocalMessages] = useState([])
     const [localquestions, setLocalQuestions] = useState([])
+    const [isAskedForHelp, setIsAskedForHelp] = useState(false)
 
     const toggleCheck = () => {
         setIsAnonym(!isAnonym)
@@ -32,12 +33,12 @@ const User = () => {
         setIsPublic(!isPublic)
         console.log('after', isPublic)
     }
-    const [isTaken, setIsTaken] = useState(false)
-    const takeHelp = () => {
+    // const [isTaken, setIsTaken] = useState(false)
+    // const takeHelp = () => {
 
-        setIsTaken(!isTaken)
+    //     setIsTaken(!isTaken)
 
-    }
+    // }
 
     useEffect(() => {
         const { name, isInstructor } = queryString.parse(window.location.search)
@@ -88,7 +89,7 @@ const User = () => {
             // console.log('effect', message)
             // console.log('effect', messages)
         })
-        console.log('effect3', helps)
+        // console.log('effect3', helps)
     }, [])
     const sendMessage = (event) => {
 
@@ -101,7 +102,7 @@ const User = () => {
         }
 
         if (message) {
-            socket.emit('sendMessage', message);
+            socket.emit('sendMessage', message, setMessageBody(''));
         }
     }
 
@@ -112,6 +113,7 @@ const User = () => {
         console.log('askHelp', help)
         if (help) {
             socket.emit('askHelp', help);
+            setIsAskedForHelp(!isAskedForHelp)
         }
     }
 
@@ -153,9 +155,10 @@ const User = () => {
 
         <div>
             <div>
+                <h2>{`Welcome ${name}!`}</h2>
                 {isInstructor === 'true' ? null :
                     <div>
-                        Message: <input onChange={(event) => setMessageBody(event.target.value)} />
+                        Message: <input value={messageBody} onChange={(event) => setMessageBody(event.target.value)} />
                         <div><input name="isAnonym" type="checkbox" checked={isAnonym} onChange={(event) => { toggleCheck() }} />Anonymous Question</div>
                         {isAnonym ? <div>Anonymous questions are public!</div> :
                             <div><input name="isPublic" type="checkbox" checked={isPublic} onChange={(event) => { toggleCheck2() }} /> Public Question</div>
@@ -163,7 +166,7 @@ const User = () => {
 
                         <button className="send" type="submit" onClick={(event) => sendMessage(event)}>Send</button>
                         {/* {console.log('inst', isInstructor)} */}
-                        <button className="help" type="submit" onClick={(event) => askHelp(event)}>Ask for help</button>
+                        {isAskedForHelp ? <div>You have {helps.filter(i => !i.isTaken).length - 1} help request(s) ahead of you!</div> : <button className="help" type="submit" onClick={(event) => askHelp(event)}>Ask for help</button>}
                     </div>}
                 {/* <span>{messages.length}</span> */}
                 {console.log('map', isInstructor === 'true')}
