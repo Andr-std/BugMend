@@ -166,7 +166,7 @@ const User = () => {
 
                         <button className="send" type="submit" onClick={(event) => sendMessage(event)}>Send</button>
                         {/* {console.log('inst', isInstructor)} */}
-                        {isAskedForHelp ? <div>You have {helps.filter(i => !i.isTaken).length - 1} help request(s) ahead of you!</div> : <button className="help" type="submit" onClick={(event) => askHelp(event)}>Ask for help</button>}
+                        {isAskedForHelp ? <div>There are {helps.filter(i => !i.isTaken).length - 1} help request(s) ahead of yours!</div> : <button className="help" type="submit" onClick={(event) => askHelp(event)}>Ask for help</button>}
                     </div>}
                 {/* <span>{messages.length}</span> */}
                 {console.log('map', isInstructor === 'true')}
