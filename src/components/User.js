@@ -22,7 +22,7 @@ const User = () => {
     const [isAnonym, setIsAnonym] = useState(true)
     const [localmessages, setLocalMessages] = useState([])
     const [localquestions, setLocalQuestions] = useState([])
-    const [isAskedForHelp, setIsAskedForHelp] = useState(false)
+    // const [isAskedForHelp, setIsAskedForHelp] = useState(false)
 
     const toggleCheck = () => {
         setIsAnonym(!isAnonym)
@@ -109,11 +109,14 @@ const User = () => {
     const askHelp = (event) => {
 
         // event.preventDefault()
-        const help = { id: helps.length + 1, userId: socket.id, isTaken: false, stdName: name, instName: '', instId: '' }
+        const help = {
+            userId: socket.id, stdName: name,
+            instName: '', instId: '', isSolved: false
+        }
         console.log('askHelp', help)
         if (help) {
             socket.emit('askHelp', help);
-            setIsAskedForHelp(!isAskedForHelp)
+            // setIsAskedForHelp(!isAskedForHelp)
         }
     }
 
@@ -165,20 +168,24 @@ const User = () => {
                         }
 
                         <button className="send" type="submit" onClick={(event) => sendMessage(event)}>Send</button>
-                        {/* {console.log('inst', isInstructor)} */}
-                        {isAskedForHelp ? <div>There are {helps.filter(i => !i.isTaken).length - 1} help request(s) ahead of yours!</div> : <button className="help" type="submit" onClick={(event) => askHelp(event)}>Ask for help</button>}
+                        {helps.filter(i => i.stdName === name).length === 0 ? <button className="help" type="submit" onClick={(event) => askHelp(event)}>Ask for help</button> :
+                            helps.filter(i => i.stdName === name && !i.instName).length === 1 ? <div>There are {helps.map(i => i.stdName).indexOf(name)} help request(s) ahead of yours!</div> :
+                                helps.filter(i => i.stdName === name && i.instName).length === 1 ? <div>Instructor {helps.filter(i => i.stdName === name && i.instName)[0].instName} took your help request!</div> : null}
+
+                        {/* {isAskedForHelp ? <div>There are {helps.filter(i => !i.instName).length - 1} help request(s) ahead of yours!</div> : <button className="help" type="submit" onClick={(event) => askHelp(event)}>Ask for help</button>} */}
                     </div>}
                 {/* <span>{messages.length}</span> */}
                 {console.log('map', isInstructor === 'true')}
                 {isInstructor === 'true' ? helps.map(helpItem => (
                     <Help id={helpItem.id}
-                        isTaken={helpItem.isTaken}
+                        // isTaken={helpItem.isTaken}
                         userId={helpItem.userId}
                         instId={helpItem.instId}
                         socketId={socket.id}
                         instName={helpItem.instName}
                         name={name}
                         stdName={helpItem.stdName}
+                        // isSolved={helpItem.isSolved}
                         key={helpItem.id} />
                 )) : null}
                 {localmessages.map(localmessage => (

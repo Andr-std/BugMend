@@ -14,7 +14,23 @@ export const Help = (props) => {
 
 
         // event.preventDefault()
-        const help = { id: props.id, userId: props.userId, instId: props.socketId, isTaken: true, stdName: props.stdName, instName: props.name }
+        const help = {
+            userId: props.userId, instId: props.socketId,
+            stdName: props.stdName, instName: props.name, isSolved: false
+        }
+
+        if (help) {
+            socket.emit('askHelp', help);
+        }
+    }
+    const helpSolved = (event) => {
+
+
+        // event.preventDefault()
+        const help = {
+            userId: props.userId, instId: '',
+            stdName: props.stdName, instName: '', isSolved: true
+        }
 
         if (help) {
             socket.emit('askHelp', help);
@@ -22,9 +38,9 @@ export const Help = (props) => {
     }
     return (
         <div>
-            {console.log('props', props.isTaken === false)}
-            {!props.isTaken ? <button className="helptaken" type="button" onClick={(event) => takeHelp(event)}>{`Take help request from ${props.stdName}`}</button> :
-                <div>{`Help request of ${props.stdName} is taken by ${instDisplayName}`}</div>}
+            {/* {console.log('props', props.isTaken === false)} */}
+            {!props.instName ? <button className="helptaken" type="button" onClick={(event) => takeHelp(event)}>{`Take help request from ${props.stdName}`}</button> :
+                <div>{`Help request of ${props.stdName} is taken by ${instDisplayName}`}{instDisplayName === 'you' ? <button className="helptaken" type="button" onClick={(event) => helpSolved(event)}>Done!</button> : null}</div>}
 
         </div>
     )
